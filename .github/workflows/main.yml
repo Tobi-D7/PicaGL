@@ -47,8 +47,6 @@ jobs:
         id: build
         run: |
           make
-          git config --global user.email "tobid7@outlook.de"
-          git config --global user.name "Tobi-D7"
           mkdir -p ~/artifacts
           mkdir -p ~/artifacts/include
           mkdir -p ~/artifacts/lib
