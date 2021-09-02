@@ -109,7 +109,7 @@ jobs:
           mkdir -p libs/
           cd libs
           cp -r ${{ github.workspace }}/build/* .
-          git stage .
+          git stage *
           git commit -m "PicaGL sample | v$CURRENT_DATE"
           git tag v$CURRENT_DATE
           git push origin main v$CURRENT_DATE
