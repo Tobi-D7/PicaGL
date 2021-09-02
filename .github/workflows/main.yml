@@ -110,6 +110,6 @@ jobs:
           cd libs
           cp -r ${{ github.workspace }}/build/* .
           git stage .
-          git commit -m "PicaGL sample | $COMMIT_HASH"
+          git commit -m "PicaGL sample | v$CURRENT_DATE"
           git tag v$CURRENT_DATE
           git push origin main v$CURRENT_DATE
