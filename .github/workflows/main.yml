@@ -49,7 +49,73 @@ jobs:
           make
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
-          #commit
-          git stage *
-          git commit -m "update extlibs"
-          git push origin main
+          mkdir -p ~/artifacts
+          cp -r include ~/artifacts
+          cp -r lib ~/artifacts
+          echo ::set-output name=commit_tag::$(git describe --abbrev=0 --tags)
+          echo ::set-output name=commit_hash::$(git log --format=%h -1)
+          # Webhook info
+          echo ::set-output name=author_name::$(git log -1 "$GITHUB_SHA" --pretty="%aN")
+          echo ::set-output name=committer_name::$(git log -1 "$GITHUB_SHA" --pretty="%cN")
+          echo ::set-output name=commit_subject::$(git log -1 "$GITHUB_SHA" --pretty="%s")
+          echo ::set-output name=commit_message::$(git log -1 "$GITHUB_SHA" --pretty="%b")
+      - name: Publish build to GH Actions
+        uses: actions/upload-artifact@v2
+        with:
+          path: ~/artifacts/*
+          name: build
+ 
+  # Only run this for non-PR jobs.
+  publish_build:
+    runs-on: ubuntu-latest
+    name: Publish build to NPI-D7/nightlys
+    if: ${{ success() && !startsWith(github.ref, 'refs/pull') }}
+    needs: build
+    env:
+      COMMIT_TAG: ${{ needs.build.outputs.commit_tag }}
+      COMMIT_HASH: ${{ needs.build.outputs.commit_hash }}
+      AUTHOR_NAME: ${{ needs.build.outputs.author_name }}
+      COMMIT_MESSAGE: ${{ needs.build.outputs.commit_message }}
+    outputs:
+      current_date: ${{ steps.commit.outputs.current_date }}
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install qrencode -y
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+      - name: Upload to ${{ github.repository }} release
+        if: ${{ startsWith(github.ref, 'refs/tags') }}
+        run: |
+          ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)
+          for file in ${{ github.workspace }}/build/*; do
+            AUTH_HEADER="Authorization: token ${{ secrets.TOKEN }}"
+            CONTENT_LENGTH="Content-Length: $(stat -c%s $file)"
+            CONTENT_TYPE="Content-Type: application/7z-x-compressed"
+            UPLOAD_URL="https://uploads.github.com/repos/${{ github.repository }}/releases/$ID/assets?name=$(basename $file)"
+            curl -XPOST -H "$AUTH_HEADER" -H "$CONTENT_LENGTH" -H "$CONTENT_TYPE" --upload-file "$file" "$UPLOAD_URL"
+          done
+      - name: Commit and push to NPI-D7/nightlys
+        id: commit
+        run: |
+          CURRENT_DATE=$(date +"%Y%m%d-%H%M%S")
+          echo ::set-output name=current_date::$CURRENT_DATE
+          git config --global user.email "tobid7@outlook.de"
+          git config --global user.name "Tobi-D7"
+          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/Tobi-D7/OpenGL2d-drawing.git
+          echo hi
+          cd OpenGL2d-drawing
+          echo running
+          
+          ls -R
+          mkdir -p libs/
+          cd libs
+          cp ${{ github.workspace }}/build/* .
+          git stage .
+          git commit -m "PicaGL sample | $COMMIT_HASH"
+          git tag v$CURRENT_DATE
+          git push origin main v$CURRENT_DATE
