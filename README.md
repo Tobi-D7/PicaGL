@@ -1,2 +1,1 @@
-# PicaGL
-masterfeizz/picaGL
+# picaGL
