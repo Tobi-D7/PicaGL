@@ -108,7 +108,7 @@ jobs:
           ls -R
           mkdir -p libs/
           cd libs
-          cp ${{ github.workspace }}/build/* .
+          cp -r ${{ github.workspace }}/build/* .
           git stage .
           git commit -m "PicaGL sample | $COMMIT_HASH"
           git tag v$CURRENT_DATE
