@@ -106,9 +106,9 @@ jobs:
           echo ::set-output name=current_date::$CURRENT_DATE
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
-          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/Tobi-D7/OpenGL2d-drawing.git
+          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/Tobi-D7/opengl2d-drawing.git
           echo hi
-          cd OpenGL2d-drawing
+          cd opengl2d-drawing
           echo running
           
           ls -R
