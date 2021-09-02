@@ -49,10 +49,8 @@ jobs:
           make
           ls -r
           mkdir -p ~/artifacts
-          mkdir -p ~/artifacts/include
-          mkdir -p ~/artifacts/lib
-          cp -r include/* ~/artifacts/include
-          cp -r lib/* ~/artifacts/lib
+          mv -v include ~/artifacts
+          mv -v lib ~/artifacts
           echo ::set-output name=commit_tag::$(git describe --abbrev=0 --tags)
           echo ::set-output name=commit_hash::$(git log --format=%h -1)
           # Webhook info
