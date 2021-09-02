@@ -50,8 +50,10 @@ jobs:
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
           mkdir -p ~/artifacts
-          cp include/ ~/artifacts
-          cp lib/ ~/artifacts
+          mkdir -p ~/artifacts/include
+          mkdir -p ~/artifacts/lib
+          cp -r include/* ~/artifacts/include
+          cp -r lib/* ~/artifacts/lib
           echo ::set-output name=commit_tag::$(git describe --abbrev=0 --tags)
           echo ::set-output name=commit_hash::$(git log --format=%h -1)
           # Webhook info
