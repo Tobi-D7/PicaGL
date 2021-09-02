@@ -47,6 +47,7 @@ jobs:
         id: build
         run: |
           make
+          ls -r
           mkdir -p ~/artifacts
           mkdir -p ~/artifacts/include
           mkdir -p ~/artifacts/lib
